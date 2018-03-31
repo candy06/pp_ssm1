@@ -304,7 +304,7 @@ struct tablo * findMaxTablo(struct tablo * src, struct tablo * PSUM, struct tabl
 ********************************************************************************
 *                               find_sequence()
 *
-* Description : displau the final result of the algorithm (the max sum and the
+* Description : display the final result of the algorithm (the max sum and the
                 subsequence associated)
 * Arguments   : 2 struct tablo (the source and the max)
 * Returns     : void
@@ -337,6 +337,52 @@ void find_sequence(struct tablo * src, struct tablo * M)
 
 }
 
+
+/*
+********************************************************************************
+*                               generateArrayFromFile()
+*
+* Description : generate the array by giving a file as parameter
+* Arguments   : a struct tablo (that will be the source) and a char* that
+                represents the filename
+* Returns     : void
+********************************************************************************
+*/
+
+void generateArrayFromFile(struct tablo * s, char * filename)
+{
+  FILE *file = NULL;
+  file = fopen(filename, "r");
+  if (file != NULL)
+  {
+    int * numbers = {0};
+    int current_number;
+    fseek(file, 0, SEEK_END);
+    long length_of_file = ftell(file);
+    fseek(file, 0, SEEK_SET);
+    int number_of_numbers = 0;
+    numbers = malloc(sizeof(int)*length_of_file);
+    while(!feof(file)) {
+      if (fscanf(file, "%d", &current_number) == 1) {
+        numbers[number_of_numbers++] = current_number;
+      }
+    }
+    s->size = number_of_numbers;
+    s->tab = malloc(number_of_numbers*sizeof(int));
+    for (int i = 0; i < number_of_numbers; i++) {
+      s->tab[i] = numbers[i];
+    }
+
+    m = getLog2(number_of_numbers); /* size of source = n = pow(2, m) */
+
+    fclose(file);
+  }
+  else
+  {
+    perror(filename);
+  }
+}
+
 /*
 ********************************************************************************
 *                               main()
@@ -351,9 +397,7 @@ int main(int argc, char **argv)
 {
 
   struct tablo source;
-  generateArray(&source);
-
-  m = getLog2(source.size);   /* size of source = n = pow(2, m) */
+  generateArrayFromFile(&source, argv[1]);
 
   struct tablo * PSUM = allocateTablo(source.size);
   do_up_down_final(&source, PSUM, PREFIX_MODE, SUM_OPERATION);
