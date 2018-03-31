@@ -355,18 +355,27 @@ void generateArrayFromFile(struct tablo * s, char * filename)
   file = fopen(filename, "r");
   if (file != NULL)
   {
-    int * numbers = {0};
-    int current_number;
-    fseek(file, 0, SEEK_END);
-    long length_of_file = ftell(file);
-    fseek(file, 0, SEEK_SET);
-    int number_of_numbers = 0;
+
+    int * numbers = {0};        /* array of integers deduced from the file */
+    int current_number;         /* the current integer in process */
+
+    fseek(file, 0, SEEK_END);           /* Go to the end of the file */
+    long length_of_file = ftell(file);  /* Get the length of the file */
+    fseek(file, 0, SEEK_SET);           /* Go the the begining of the file */
+
     numbers = malloc(sizeof(int)*length_of_file);
+
+    int number_of_numbers = 0;
+
+    // Read the file...
     while(!feof(file)) {
+      // If we find a number, we add it in the array and modify the number of numbers
       if (fscanf(file, "%d", &current_number) == 1) {
         numbers[number_of_numbers++] = current_number;
       }
     }
+
+    /* Update of the struct tablo given in parameter */
     s->size = number_of_numbers;
     s->tab = malloc(number_of_numbers*sizeof(int));
     for (int i = 0; i < number_of_numbers; i++) {
