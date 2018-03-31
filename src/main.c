@@ -302,36 +302,50 @@ struct tablo * findMaxTablo(struct tablo * src, struct tablo * PSUM, struct tabl
 
 /*
 ********************************************************************************
-*                               find_sequence()
+*                               find_max_value()
+*
+* Description : find the maximum value of an array
+* Arguments   : an array that represents the final array of the algorithm (M)
+* Returns     : the maximum of the array
+********************************************************************************
+*/
+
+int find_max_value(struct tablo * M)
+{
+  int size_of_m = M->size;
+
+  int max = INT_MIN;
+
+  #pragma omp parallel for
+  for (int i = 0; i < size_of_m; i++) {
+    if (M->tab[i] > max) {
+      max = M->tab[i];
+    }
+  }
+
+  return max;
+}
+
+/*
+********************************************************************************
+*                               display_result()
 *
 * Description : display the final result of the algorithm (the max sum and the
-                subsequence associated)
-* Arguments   : 2 struct tablo (the source and the max)
+                subsequence associated) accorded to the format required
+* Arguments   : 2 struct tablo (the source and the max) and an integer that
+                represents the maximum of M array
 * Returns     : void
 ********************************************************************************
 */
 
-void find_sequence(struct tablo * src, struct tablo * M)
+void display_result(struct tablo * src, struct tablo * M, int max)
 {
-    int size_of_m = M->size;
 
-    int max = INT_MIN;
-    int start = 0;
-    int end = 0;
-
-    for (int i = 0; i < size_of_m; i++) {
-      if (max < M->tab[i]) {
-        start = i;
-        end = i;
-        max = M->tab[i];
-      } else if (max == M->tab[i]) {
-        end = i;
-      }
-    }
+    int size_src = src->size;
 
     printf("%d ", max);
-    for (int i = start; i <= end; i++) {
-      printf("%d ", src->tab[i]);
+    for (int i = 0; i < size_src; i++) {
+      if (M->tab[i] == max) printf("%d ", src->tab[i]);
     }
     printf("\n");
 
@@ -422,7 +436,9 @@ int main(int argc, char **argv)
 
   struct tablo * M = findMaxTablo(&source, PSUM, SSUM, PMAX, SMAX);
 
-  find_sequence(&source, M);
+  int max = find_max_value(M);
+
+  display_result(&source, M, max);
 
   return 0;
 
