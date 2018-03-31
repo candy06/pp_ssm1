@@ -55,9 +55,9 @@ struct tablo {
 ********************************************************************************
 *                               getLog2()
 *
-* Description :
-* Arguments   :
-* Returns     :
+* Description : method to get the log base 2 of a number
+* Arguments   : an integer
+* Returns     : the log2 of the given number
 ********************************************************************************
 */
 
@@ -70,9 +70,9 @@ int getLog2(int x)
 ********************************************************************************
 *                               printArray()
 *
-* Description :
-* Arguments   :
-* Returns     :
+* Description : display the array given in parameter
+* Arguments   : a struct tablo (that represents an array)
+* Returns     : void
 ********************************************************************************
 */
 
@@ -91,9 +91,9 @@ void printArray(struct tablo * tmp)
 ********************************************************************************
 *                               allocateTablo()
 *
-* Description :
-* Arguments   :
-* Returns     :
+* Description : allocate enough memory for a tablo struct
+* Arguments   : an integer
+* Returns     : struct tablo with the specified size given in parameters
 ********************************************************************************
 */
 
@@ -111,9 +111,9 @@ struct tablo * allocateTablo(int size)
 ********************************************************************************
 *                               generateArray()
 *
-* Description :
-* Arguments   :
-* Returns     :
+* Description : method to generate and fill a sample array with custom values
+* Arguments   : struct tablo
+* Returns     : void
 ********************************************************************************
 */
 
@@ -144,9 +144,11 @@ void generateArray(struct tablo * s)
 ********************************************************************************
 *                               up()
 *
-* Description :
-* Arguments   :
-* Returns     :
+* Description : first step of the algorithm presented in class
+* Arguments   : 2 struct tablo (source, destination) and an integer that
+                represents the operation that needs to be done (SUM_OPERATION
+                or MAX_OPERATION)
+* Returns     : void
 ********************************************************************************
 */
 
@@ -177,9 +179,12 @@ void up(struct tablo * src, struct tablo * dst, int operation)
 ********************************************************************************
 *                               down()
 *
-* Description :
-* Arguments   :
-* Returns     :
+* Description : second step of the algorithm presented in class
+* Arguments   : 2 struct tablo (a and b) and 2 integers - the first integer
+                represents the mode (PREFIX_MODE or SUFFIX_MODE) and the second
+                integer represents the operation that needs to be done (SUM_OPERATION
+                or MAX_OPERATION)
+* Returns     : void
 ********************************************************************************
 */
 
@@ -211,9 +216,10 @@ void down(struct tablo * a, struct tablo * b, int mode, int operation) {
 ********************************************************************************
 *                               final()
 *
-* Description :
-* Arguments   :
-* Returns     :
+* Description : the last step of the algorithm presented in class
+* Arguments   : 2 struct tablo (a and b) and the operation that needs to be
+                done (SUM_OPERATION or MAX_OPERATION)
+* Returns     : void
 ********************************************************************************
 */
 
@@ -231,11 +237,14 @@ void final(struct tablo * a, struct tablo * b, int operation) {
 
 /*
 ********************************************************************************
-*                               doAlgo()
+*                               do_up_down_final()
 *
-* Description :
-* Arguments   :
-* Returns     :
+* Description : used to do all the algorithm presented in class from the
+                begining to the end (up, down and final)
+* Arguments   : 2 struct tablo (the source and the destination), an integer that
+                represents the mode (SUFFIX_MODE or PREFIX_MODE) and an integer
+                that represents the operation (SUM_OPERATION or MAX_OPERATION)
+* Returns     : void
 ********************************************************************************
 */
 
@@ -263,11 +272,11 @@ void do_up_down_final(struct tablo * src, struct tablo * dst, int mode, int oper
 
 /*
 ********************************************************************************
-*                               findM()
+*                               findMaxTablo()
 *
-* Description :
-* Arguments   :
-* Returns     :
+* Description : 5th step of the algorithm that (cf. TD)
+* Arguments   : 5 struct tablo (the source, PSUM, SSUM, PMAX and SMAX)
+* Returns     : the tablo of max M
 ********************************************************************************
 */
 
@@ -293,15 +302,53 @@ struct tablo * findMaxTablo(struct tablo * src, struct tablo * PSUM, struct tabl
 
 /*
 ********************************************************************************
-*                               main()
+*                               find_sequence()
 *
-* Description :
-* Arguments   :
-* Returns     :
+* Description : displau the final result of the algorithm (the max sum and the
+                subsequence associated)
+* Arguments   : 2 struct tablo (the source and the max)
+* Returns     : void
 ********************************************************************************
 */
 
-int main(int argc, char **argv) {
+void find_sequence(struct tablo * src, struct tablo * M)
+{
+    int size_of_m = M->size;
+
+    int max = INT_MIN;
+    int start = 0;
+    int end = 0;
+
+    for (int i = 0; i < size_of_m; i++) {
+      if (max < M->tab[i]) {
+        start = i;
+        end = i;
+        max = M->tab[i];
+      } else if (max == M->tab[i]) {
+        end = i;
+      }
+    }
+
+    printf("%d ", max);
+    for (int i = start; i <= end; i++) {
+      printf("%d ", src->tab[i]);
+    }
+    printf("\n");
+
+}
+
+/*
+********************************************************************************
+*                               main()
+*
+* Description : the main method of the program
+* Arguments   : argc and argv - classic
+* Returns     : integer to say if the execution is done corectly or not
+********************************************************************************
+*/
+
+int main(int argc, char **argv)
+{
 
   struct tablo source;
   generateArray(&source);
@@ -310,21 +357,20 @@ int main(int argc, char **argv) {
 
   struct tablo * PSUM = allocateTablo(source.size);
   do_up_down_final(&source, PSUM, PREFIX_MODE, SUM_OPERATION);
-  printArray(PSUM);
 
   struct tablo * SSUM = allocateTablo(source.size);
   do_up_down_final(&source, SSUM, SUFFIX_MODE, SUM_OPERATION);
-  printArray(SSUM);
 
   struct tablo * SMAX = allocateTablo(source.size);
   do_up_down_final(PSUM, SMAX, SUFFIX_MODE, MAX_OPERATION);
-  printArray(SMAX);
 
   struct tablo * PMAX = allocateTablo(source.size);
   do_up_down_final(SSUM, PMAX, PREFIX_MODE, MAX_OPERATION);
-  printArray(PMAX);
 
   struct tablo * M = findMaxTablo(&source, PSUM, SSUM, PMAX, SMAX);
-  printArray(M);
+
+  find_sequence(&source, M);
+
+  return 0;
 
 }
